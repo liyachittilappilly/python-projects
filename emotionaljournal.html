@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Journal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f0f7ff;
+            background-image: 
+                radial-gradient(#e6f0ff 1px, transparent 1px),
+                radial-gradient(#e6f0ff 1px, #f0f7ff 1px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #4a5568;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(173, 216, 230, 0.3);
+            width: 100%;
+            max-width: 550px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #b8e0ff, #d4e6ff, #b8e0ff);
+            background-size: 200% 100%;
+            animation: gradient 3s ease infinite;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .header {
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            color: #5b7fa6;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            font-size: 1rem;
+            color: #8ca7c7;
+            font-weight: 300;
+            font-style: italic;
+        }
+        
+        .quote {
+            margin-top: 15px;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            color: #a0aec0;
+            font-size: 0.9rem;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .input-section {
+            margin-bottom: 25px;
+        }
+        
+        .input-section label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 500;
+            color: #5b7fa6;
+            font-size: 0.95rem;
+        }
+        
+        .text-input {
+            width: 100%;
+            padding: 15px;
+            border: 1.5px solid #e2ecf7;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+            background-color: #f8fbff;
+        }
+        
+        .text-input:focus {
+            outline: none;
+            border-color: #b8d4ff;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(184, 212, 255, 0.2);
+        }
+        
+        .analyze-btn {
+            background: linear-gradient(135deg, #d4e6ff, #b8e0ff);
+            color: #5b7fa6;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(184, 212, 255, 0.4);
+        }
+        
+        .result-section {
+            text-align: center;
+            margin-top: 30px;
+            display: none;
+            padding: 20px;
+            background-color: #f8fbff;
+            border-radius: 12px;
+        }
+        
+        .emotion-image {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 20px;
+            border: 5px solid white;
+            box-shadow: 0 5px 15px rgba(184, 212, 255, 0.3);
+        }
+        
+        .emotion-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.7rem;
+            font-weight: 500;
+            color: #5b7fa6;
+            margin-bottom: 15px;
+        }
+        
+        .confidence-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e2ecf7;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #b8e0ff, #8ca7c7);
+            border-radius: 4px;
+            transition: width 0.8s ease-in-out;
+        }
+        
+        .emotion-keywords {
+            margin-top: 20px;
+            text-align: left;
+            background-color: white;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #e2ecf7;
+        }
+        
+        .emotion-keywords h3 {
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 12px;
+            color: #5b7fa6;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .keyword-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .keyword {
+            background-color: #e2ecf7;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #5b7fa6;
+        }
+        
+        .book-icon {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            color: #b8d4ff;
+            font-size: 1.5rem;
+        }
+        
+        .coffee-icon {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            color: #b8d4ff;
+            font-size: 1.5rem;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.8rem;
+            color: #a0aec0;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <i class="fas fa-book book-icon"></i>
+            <h1>Emotion Journal</h1>
+            <p>Express your feelings and discover your emotions</p>
+            <div class="quote">"I live in two worlds, one is a world of books."</div>
+            <i class="fas fa-coffee coffee-icon"></i>
+        </div>
+        
+        <div class="content">
+            <div class="input-section">
+                <label for="user-input">How are you feeling today?</label>
+                <textarea id="user-input" class="text-input" rows="4" placeholder="Write your thoughts and feelings here..."></textarea>
+                <button id="analyze-btn" class="analyze-btn">
+                    <i class="fas fa-feather-alt"></i>
+                    Analyze Emotion
+                </button>
+            </div>
+            
+            <div id="result-section" class="result-section">
+                <img id="emotion-image" class="emotion-image" src="" alt="Emotion">
+                <div id="emotion-text" class="emotion-text"></div>
+                <div class="confidence-bar">
+                    <div id="confidence-fill" class="confidence-fill" style="width: 0%"></div>
+                </div>
+                <div id="emotion-keywords" class="emotion-keywords">
+                    <h3>Detected Keywords:</h3>
+                    <div id="keyword-list" class="keyword-list"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>"Sometimes you need to sit alone and write about your feelings."</p>
+        </div>
+    </div>
+    <script>
+        // Expanded emotion keywords mapping with placeholder images
+        const emotionKeywords = {
+            happy: {
+                keywords: ['happy', 'joy', 'joyful', 'excited', 'elated', 'cheerful', 'pleased', 'delighted', 'glad', 'content', 'satisfied', 'thrilled', 'ecstatic', 'blissful', 'merry', 'jubilant', 'euphoric', 'radiant', 'lively', 'upbeat', 'positive', 'optimistic', 'gleeful', 'chipper', 'sunny', 'smiling', 'grinning', 'laughing', 'giggling', 'celebrating', 'festive', 'jovial', 'mirthful'],
+                image: 'https://i.pinimg.com/736x/a8/26/42/a826421d4058c051fc3cb823bdf74697.jpg'
+            },
+            sad: {
+                keywords: ['sad', 'unhappy', 'sorrow', 'grief', 'miserable', 'depressed', 'down', 'blue', 'gloomy', 'melancholy', 'heartbroken', 'disappointed', 'devastated', 'upset', 'tearful', 'crying', 'weeping', 'mournful', 'somber', 'dejected', 'despondent', 'forlorn', 'wistful', 'lugubrious', 'dismal', 'dreary', 'grief-stricken', 'sorrowful', 'dejected', 'downcast', 'low', 'unhappy', 'miserable'],
+                image: 'https://i.pinimg.com/736x/d4/d9/5d/d4d95d1b3eff089649fa6e778fb51d31.jpg'
+            },
+            angry: {
+                keywords: ['angry', 'mad', 'furious', 'irritated', 'annoyed', 'frustrated', 'rage', 'outraged', 'livid', 'irate', 'hostile', 'resentful', 'jealous', 'envy', 'fuming', 'incensed', 'irate', 'wrathful', 'indignant', 'cross', 'vexed', 'piqued', 'aggravated', 'irked', 'provoked', 'infuriated', 'enraged', 'seething', 'burning', 'ticked off', 'steamed'],
+                image: 'https://i.pinimg.com/736x/0b/80/48/0b8048c166f39843c007f033792578b0.jpg'
+            },
+            surprised: {
+                keywords: ['surprised', 'amazed', 'astonished', 'shocked', 'stunned', 'bewildered', 'startled', 'unexpected', 'sudden', 'wow', 'whoa', 'astounded', 'flabbergasted', 'taken aback', 'unprepared', 'jolted', 'astonished', 'amazed', 'bewildered', 'confounded', 'perplexed', 'dumbfounded', 'stupefied', 'thunderstruck', 'awestruck'],
+                image: 'https://i.pinimg.com/1200x/03/8d/01/038d01f8612b42271b3d9b11e213342a.jpg'
+            },
+            fearful: {
+                keywords: ['afraid', 'scared', 'frightened', 'terrified', 'anxious', 'worried', 'nervous', 'panic', 'fear', 'dread', 'concerned', 'alarmed', 'apprehensive', 'timid', 'tense', 'uneasy', 'jittery', 'panicky', 'horrified', 'petrified', 'shaky', 'trembling', 'intimidated', 'spooked', 'fearful', 'frightful', 'daunted'],
+                image: 'https://i.pinimg.com/1200x/04/13/ee/0413eee039aafd4f47d93fd956639ac8.jpg'
+            },
+            disgusted: {
+                keywords: ['disgusted', 'revolted', 'repulsed', 'sickened', 'nauseated', 'appalled', 'disgusting', 'gross', 'eww', 'yuck', 'repugnant', 'abhorrent', 'loathsome', 'sick', 'queasy', 'nauseous', 'repelled', 'offended', 'outraged', 'aversion', 'disapproval', 'distaste', 'repugnance', 'revulsion'],
+                image: 'https://i.pinimg.com/1200x/d1/f2/84/d1f284a26d12ef17445abe67e721e18a.jpg'
+            },
+            neutral: {
+                keywords: ['neutral', 'okay', 'fine', 'alright', 'normal', 'calm', 'peaceful', 'relaxed', 'composed', 'serene', 'balanced', 'stable', 'unemotional', 'impassive', 'unconcerned', 'unaffected', 'detached', 'uninvolved', 'unbiased', 'objective', 'unfazed', 'unperturbed', 'placid', 'tranquil', 'even-tempered'],
+                image: 'https://i.pinimg.com/1200x/00/56/c6/0056c6a2120fc3b90807bbd484870c59.jpg'
+            },
+            love: {
+                keywords: ['love', 'loving', 'adoring', 'affectionate', 'fond', 'devoted', 'enamored', 'infatuated', 'charmed', 'captivated', 'smitten', 'tender', 'warm', 'passionate', 'romantic', 'caring', 'cherish', 'treasure', 'adore', 'worship', 'admire', 'revere', 'esteem', 'prize', 'value', 'hold dear', 'beloved', 'darling', 'sweetheart'],
+                image: 'https://i.pinimg.com/1200x/bd/46/23/bd462337b2366daa704ca3d8124bf028.jpg'
+            },
+            confused: {
+                keywords: ['confused', 'bewildered', 'perplexed', 'puzzled', 'baffled', 'mystified', 'stupefied', 'disoriented', 'uncertain', 'unsure', 'doubtful', 'hesitant', 'indecisive', 'torn', 'ambivalent', 'mixed up', 'muddled', 'unclear', 'foggy', 'lost', 'dazed', 'disconcerted', 'discombobulated', 'nonplussed', 'unsettled'],
+                image: 'https://i.pinimg.com/736x/0d/42/61/0d42618b480ec89281355526ae911a94.jpg'
+            },
+            tired: {
+                keywords: ['tired', 'exhausted', 'fatigued', 'weary', 'drained', 'worn out', 'sleepy', 'drowsy', 'lethargic', 'listless', 'enervated', 'sapped', 'spent', 'run down', 'burned out', 'wiped out', 'pooped', 'dog tired', 'dead tired', 'knackered', 'shattered', 'debilitated', 'jaded', 'washed out', 'weary'],
+                image: 'https://i.pinimg.com/736x/df/36/a9/df36a9a150f5c226bb22bced649d7f8c.jpg'
+            },
+            bored: {
+                keywords: ['bored', 'uninterested', 'unengaged', 'unenthused', 'apathetic', 'indifferent', 'disinterested', 'unconcerned', 'unmoved', 'unimpressed', 'dispassionate', 'listless', 'weary', 'tired of', 'fed up', 'sick of', 'tired of', 'unstimulated', 'unexcited', 'uninspired', 'unmotivated', 'uninspired', 'unenthusiastic'],
+                image: 'https://i.pinimg.com/736x/73/53/78/735378d55e63be6330313f04d56060f0.jpg'
+            },
+            grateful: {
+                keywords: ['grateful', 'thankful', 'appreciative', 'indebted', 'obliged', 'beholden', 'gratified', 'pleased', 'content', 'satisfied', 'glad', 'happy', 'relieved', 'touched', 'moved', 'affected', 'touched', 'appreciative', 'obliged', 'thankful', 'gratified', 'pleased', 'content', 'satisfied'],
+                image: 'https://i.pinimg.com/736x/47/e3/7b/47e37b77d60531e0a130f2d2f3fd442d.jpg'
+            },
+            optimistic: {
+                keywords: ['optimistic', 'hopeful', 'positive', 'confident', 'buoyant', 'cheerful', 'encouraged', 'encouraging', 'promising', 'bright', 'rosy', 'sanguine', 'hopeful', 'confident', 'assured', 'certain', 'sure', 'positive', 'upbeat', 'enthusiastic', 'eager', 'keen', 'anticipating', 'expectant'],
+                image: 'https://i.pinimg.com/1200x/69/ed/0d/69ed0dc832e00980ebbd6bb720f5f2a4.jpg'
+            },
+            pessimistic: {
+                keywords: ['pessimistic', 'negative', 'gloomy', 'doubtful', 'skeptical', 'cynical', 'dismal', 'bleak', 'hopeless', 'despairing', 'discouraged', 'discouraging', 'foreboding', 'ominous', 'threatening', 'sinister', 'unpromising', 'unfavorable', 'adverse', 'unlucky', 'unfortunate', 'discouraged', 'disheartened', 'dispirited', 'downcast'],
+                image: 'https://i.pinimg.com/736x/22/0d/f4/220df4679d7d010b5fe51bb22ba7563f.jpg'
+            },
+            excited: {
+                keywords: ['excited', 'thrilled', 'eager', 'enthusiastic', 'keen', 'animated', 'energetic', 'lively', 'vivacious', 'spirited', 'exuberant', 'buoyant', 'elated', 'jubilant', 'ecstatic', 'euphoric', 'rapturous', 'overjoyed', 'delighted', 'pleased', 'gratified', 'satisfied', 'happy', 'glad', 'cheerful', 'merry', 'jovial'],
+                image: 'https://i.pinimg.com/1200x/b3/44/da/b344dacf5932e55c7cd2038aee953401.jpg'
+            },
+            lonely: {
+                keywords: ['lonely', 'alone', 'lonesome', 'isolated', 'solitary', 'abandoned', 'forsaken', 'deserted', 'rejected', 'unloved', 'uncared for', 'neglected', 'forgotten', 'left out', 'excluded', 'ostracized', 'alienated', 'separated', 'detached', 'disconnected', 'unattached', 'unaccompanied', 'by oneself', 'single', 'sole'],
+                image: 'https://i.pinimg.com/1200x/29/e0/13/29e013f85f63ba06b10015577e9d781b.jpg'
+            }
+        };
+        
+        // DOM elements
+        const userInput = document.getElementById('user-input');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const resultSection = document.getElementById('result-section');
+        const emotionImage = document.getElementById('emotion-image');
+        const emotionText = document.getElementById('emotion-text');
+        const confidenceFill = document.getElementById('confidence-fill');
+        const keywordList = document.getElementById('keyword-list');
+        
+        // Analyze emotion function
+        function analyzeEmotion() {
+            const text = userInput.value.toLowerCase().trim();
+            
+            if (text === '') {
+                showNotification('Please write something about your feelings.', 'error');
+                return;
+            }
+            
+            // Count emotion keywords in the text
+            const emotionScores = {};
+            const detectedKeywords = [];
+            
+            // Initialize scores
+            for (const emotion in emotionKeywords) {
+                emotionScores[emotion] = 0;
+            }
+            
+            // Count keyword occurrences
+            for (const [emotion, data] of Object.entries(emotionKeywords)) {
+                for (const keyword of data.keywords) {
+                    const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
+                    const matches = text.match(regex);
+                    if (matches) {
+                        emotionScores[emotion] += matches.length;
+                        detectedKeywords.push(...matches);
+                    }
+                }
+            }
+            
+            // Find the emotion with the highest score
+            let detectedEmotion = 'neutral';
+            let maxScore = 0;
+            
+            for (const [emotion, score] of Object.entries(emotionScores)) {
+                if (score > maxScore) {
+                    maxScore = score;
+                    detectedEmotion = emotion;
+                }
+            }
+            
+            // Calculate confidence (simplified)
+            const totalKeywords = Object.values(emotionScores).reduce((a, b) => a + b, 0);
+            const confidence = totalKeywords > 0 ? Math.min(100, Math.round((maxScore / totalKeywords) * 100)) : 50;
+            
+            // Display results
+            displayResult(detectedEmotion, confidence, detectedKeywords);
+        }
+        
+        // Display result function
+        function displayResult(emotion, confidence, keywords) {
+            // Set emotion image
+            emotionImage.src = emotionKeywords[emotion].image;
+            emotionImage.alt = emotion.charAt(0).toUpperCase() + emotion.slice(1);
+            
+            // Set emotion text
+            emotionText.textContent = `Detected Emotion: ${emotion.charAt(0).toUpperCase() + emotion.slice(1)}`;
+            
+            // Set confidence bar
+            confidenceFill.style.width = `${confidence}%`;
+            
+            // Display detected keywords
+            keywordList.innerHTML = '';
+            const uniqueKeywords = [...new Set(keywords)];
+            uniqueKeywords.forEach(keyword => {
+                const keywordElement = document.createElement('span');
+                keywordElement.className = 'keyword';
+                keywordElement.textContent = keyword;
+                keywordList.appendChild(keywordElement);
+            });
+            
+            // Show result section with animation
+            resultSection.style.display = 'block';
+            resultSection.style.opacity = '0';
+            resultSection.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                resultSection.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                resultSection.style.opacity = '1';
+                resultSection.style.transform = 'translateY(0)';
+            }, 10);
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.left = '50%';
+            notification.style.transform = 'translateX(-50%)';
+            notification.style.backgroundColor = type === 'success' ? '#d4edda' : '#f8d7da';
+            notification.style.color = type === 'success' ? '#155724' : '#721c24';
+            notification.style.padding = '12px 20px';
+            notification.style.borderRadius = '8px';
+            notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+            notification.style.zIndex = '1000';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 500);
+            }, 3000);
+        }
+        
+        // Event listeners
+        analyzeBtn.addEventListener('click', analyzeEmotion);
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                analyzeEmotion();
+            }
+        });
+    </script>
+</body>
+</html>
